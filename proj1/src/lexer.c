@@ -6,7 +6,6 @@
 #include "parser.h"
 
 #define INIT_BUFFER_SIZE 256
-
 void init_lex(lexer *luthor) {
     luthor->file = NULL;
     luthor->buffer = NULL;
@@ -18,10 +17,10 @@ void open_file(lexer *lex, char *filename) {
     if (lex) {
 	lex->file = fopen(filename, "r");
 	if (!lex->file) {
-	    fatal_error("Could not read input file.\n");
+    fatal_error("Could not read input file.\n");
 	}
 	lex->buff_len = INIT_BUFFER_SIZE;
-	lex->buffer = safe_calloc(INIT_BUFFER_SIZE * sizeof(char));
+  lex->buffer = safe_calloc(INIT_BUFFER_SIZE * sizeof(char));
     }
 }
 
@@ -34,9 +33,60 @@ void close_file(lexer *lex) {
     }
 }
 
+int white(char curr_char) {
+  return (curr_char == '\r' || curr_char == '\n' || curr_char == ' ' || curr_char == '\t');
+}
+
 void read_token(lexer *lex) {
     /* TODO: Implement me. */
     /* HINT: fgetc() and ungetc() could be pretty useful here. */
+  char curr_char;
+  int keyword = 0;
+  int i = 1;
+  int keywords_left = node_READ_INT - 4;
+  while (curr_char = fgetc(lex->file)) {
+    if (curr_char == EOF) {
+      lex->type = token_END;
+    } else if (white(curr_char)) {
+      continue;
+    } else if (curr_char == '(') {
+      lex->type = token_OPEN_PAREN;
+      *lex->buffer = curr_char;
+    } else if (curr_char == ')') {
+      lex->type = token_CLOSE_PAREN;
+      *lex->buffer = curr_char;
+    } else if (curr_char == '"') {
+      do {
+        *(lex->buffer + i - 1) = curr_char;
+        curr_char = fgetc(lex->file);
+      } while (i++ && curr_char != '"');
+      *(lex->buffer + i - 1) = curr_char;
+      *(lex->buffer + i) = '\0';
+      lex->type = token_STRING;
+    } else {
+      do {
+        *(lex->buffer + i - 1) = curr_char;
+        curr_char = fgetc(lex->file);
+      } while (!white(curr_char) && curr_char != '(' && curr_char != ')' && i++);
+      ungetc(curr_char, lex->file);
+      *(lex->buffer + i) = '\0';
+      for (; keywords_left >= 0; keywords_left--) {
+        if (!strcmp(lex->buffer, keywords[keywords_left])) {
+          lex->type = token_KEYWORD;
+          keyword = 1;
+          break;
+        }
+      }
+      if (keyword) {
+        break;
+      } else {
+        lex->type = token_NAME;
+      }
+    }
+    break;
+  }
+  lex->buff_len = i;
+  return;
 }
 
 token_type peek_type(lexer *lex) {
