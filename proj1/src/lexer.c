@@ -63,6 +63,14 @@ void read_token(lexer *lex) {
       *(lex->buffer + i - 1) = curr_char;
       *(lex->buffer + i) = '\0';
       lex->type = token_STRING;
+    } else if (curr_char >= '0' && curr_char <= '9') {
+      do {
+        *(lex->buffer + i - 1) = curr_char;
+        curr_char = fgetc(lex->file);
+      } while (curr_char >= '0' && curr_char <= '9' && i++);
+      ungetc(curr_char, lex->file);
+      *(lex->buffer + i) = '\0';
+      lex->type = token_INT;
     } else {
       do {
         *(lex->buffer + i - 1) = curr_char;
