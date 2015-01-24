@@ -43,7 +43,32 @@ AST *build_ast (lexer *lex) {
     /* TODO: Implement me. */
     /* Hint: switch statements are pretty cool, and they work 
      *       brilliantly with enums. */
-    return NULL;
+    token_type curr_char = peek_type(lex);
+    AST *tree = (AST *) malloc(sizeof(AST));
+    switch(curr_char) {
+      case token_OPEN_PAREN:
+        read_token(lex);
+        tree->type = lookup_keyword_enum(lex->buffer);// not right, we could have a defined function rather than keyword
+        tree->val = malloc(lex->buff_len);
+        strcpy(tree->val, lex->val);
+
+        AST_lst *children = (AST_lst *) malloc(sizeof(AST_lst));
+        tree->children = children;
+        tree->last_child = children;
+        read_token(lex);
+        AST *child = build_ast(lex);
+        tree->children->val = child; //does this deref right?
+        tree->children->next = NULL;
+        while (peek_type(lex) != token_CLOSE_PAREN) {
+          child = build_ast(lex);
+          tree->last_child->next = (AST_lst *) malloc(sizeof(AST_lst));
+          tree->last_child->next->val = build_ast(lex);
+          tree->last_child->next->next = NULL;
+          tree->last_child = tree->last_child->next;
+        }
+      case token_INT:
+        return;
+    }
 }
 
 void free_ast (AST *ptr) {
