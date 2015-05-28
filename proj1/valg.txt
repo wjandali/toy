@@ -1,0 +1,12 @@
+looking up assign
+only assign n
+token string "First string"
+looking up assign
+only assign k
+token string "second string"
+looking up function
+only assign (
+only assign a1
+looking up assign
+only assign n
+token string "fafiaj"

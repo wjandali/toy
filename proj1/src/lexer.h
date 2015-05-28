@@ -4,14 +4,15 @@
 #include <stdio.h>
 
 /** An enumeration of the four different types of tokens. */
-typedef enum token_type {token_INT /* integer literal */,
-			 token_STRING /* string literal*/,
-			 token_NAME /* variable or function name */,
-			 token_KEYWORD /* keyword */,
-			 token_OPEN_PAREN /* '(' */,
-			 token_CLOSE_PAREN /* ')' */,
-			 token_END /* end of file */,
-			 token_SENTINEL /* 'special' value */} token_type;
+typedef enum token_type {
+  token_INT /* integer literal */,
+  token_STRING /* string literal*/,
+  token_NAME /* variable or function name */,
+  token_KEYWORD /* keyword */,
+  token_OPEN_PAREN /* '(' */,
+  token_CLOSE_PAREN /* ')' */,
+  token_END /* end of file */,
+  token_SENTINEL /* 'special' value */} token_type;
 
 typedef struct lexer {
     /** Pointer to current input source. */

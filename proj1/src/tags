@@ -1,0 +1,183 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+AST	parser.h	/^struct AST {$/;"	s
+AST	parser.h	/^typedef struct AST AST;$/;"	t	typeref:struct:AST
+AST_lst	parser.h	/^struct AST_lst {$/;"	s
+AST_lst	parser.h	/^typedef struct AST_lst AST_lst;$/;"	t	typeref:struct:AST_lst
+AST_lst_len	parser.c	/^size_t AST_lst_len(AST_lst *lst) {$/;"	f
+CC	Makefile	/^CC = gcc$/;"	m
+CFLAGS	Makefile	/^CFLAGS = -std=gnu99 -Wall -g$/;"	m
+CODE_GEN_H	code_gen.h	2;"	d
+HMAP_H	hmap.h	2;"	d
+INIT_BUFFER_SIZE	lexer.c	8;"	d	file:
+INIT_BUFFER_SIZE	lexer_iso.c	9;"	d	file:
+INIT_CAPACITY	util/smap.c	10;"	d	file:
+LEXER_H	lexer.h	2;"	d
+LOAD_FACTOR	util/smap.c	7;"	d	file:
+MAX	compiler.c	11;"	d	file:
+MAX	util/smap.c	12;"	d	file:
+OP_TOKENS	lexer.c	10;"	d	file:
+PARSER_H	parser.h	2;"	d
+SMAP_H	util/smap.h	2;"	d
+SRCS	Makefile	/^SRCS = compiler.c lexer.c parser.c code_gen.c util\/util.c util\/smap.c$/;"	m
+TOKEN_COUNT	test.c	/^int TOKEN_COUNT = 8;$/;"	v
+TOTAL_TOKENS	lexer.c	9;"	d	file:
+UTIL_H	util/util.h	2;"	d
+append_ast_to_top_level	compiler.c	/^void append_ast_to_top_level(AST *ast) {$/;"	f
+args_length	parser.c	/^int args_length[] = {2, 2, 2, 2, 2, 2, 2, 2, 2, -2, 2, 2, 3, 2, 4, -2, 1, 1, 0};$/;"	v
+bucket	util/smap.c	/^typedef struct bucket {$/;"	s	file:
+bucket	util/smap.c	/^} bucket;$/;"	t	typeref:struct:bucket	file:
+bucket_insert	util/smap.c	/^void bucket_insert(bucket *buck, char *str, int val) {$/;"	f
+buckets	util/smap.c	/^  bucket *buckets;$/;"	m	struct:smap	file:
+buff_len	lexer.h	/^    size_t buff_len;$/;"	m	struct:lexer
+buffer	lexer.h	/^    char *buffer;$/;"	m	struct:lexer
+build_ast	parser.c	/^AST *build_ast (lexer *lex) {$/;"	f
+capacity	util/smap.c	/^  size_t capacity;$/;"	m	struct:bucket	file:
+check_sub_tree	parser.c	/^void check_sub_tree(AST *ptr) {$/;"	f
+check_tree_shape	parser.c	/^void check_tree_shape(AST *ptr) {$/;"	f
+children	parser.h	/^    AST_lst *children; \/* A list of all of the children of this node*\/$/;"	m	struct:AST
+close_file	lexer.c	/^void close_file(lexer *lex) {$/;"	f
+close_file	lexer_iso.c	/^void close_file(lexer *lex) {$/;"	f
+compile	compiler.c	/^void compile(char *filename) {$/;"	f
+data_seg_opened	code_gen.c	/^int data_seg_opened = 0;$/;"	v
+decls	parser.c	/^smap *decls;$/;"	v
+emit_exit	code_gen.c	/^void emit_exit() {$/;"	f
+emit_functions	code_gen.c	/^void emit_functions(AST *ast) {$/;"	f
+emit_main	code_gen.c	/^void emit_main(AST *ast) {$/;"	f
+emit_static_memory	code_gen.c	/^void emit_static_memory() {$/;"	f
+emit_strings	code_gen.c	/^void emit_strings(AST *ast) {$/;"	f
+enums	parser.c	/^int enums[] = {node_AND, node_OR, node_PLUS, node_MINUS, node_MUL, node_DIV,$/;"	v
+expand	util/smap.c	/^void expand(smap *map) {$/;"	f
+fatal_error	util/util.c	/^void fatal_error(char* msg) {$/;"	f
+file	lexer.h	/^    FILE *file;$/;"	m	struct:lexer
+free_ast	parser.c	/^void free_ast (AST *ptr) {$/;"	f
+func_decls	parser.c	/^smap *func_decls;$/;"	v
+gather_decls	parser.c	/^void gather_decls(AST *ast, char *env, int is_top_level) {$/;"	f
+hash_string	util/smap.c	/^size_t hash_string(char *str) {$/;"	f
+hmap	hmap.h	/^typedef struct hmap hmap;$/;"	t	typeref:struct:hmap
+init_extras	parser.c	/^void init_extras() {$/;"	f
+init_lex	lexer.c	/^void init_lex(lexer *luthor) {$/;"	f
+init_lex	lexer_iso.c	/^void init_lex(lexer *luthor) {$/;"	f
+initialize_keyword_to_enum_mapping	parser.c	/^void initialize_keyword_to_enum_mapping() {$/;"	f
+key	util/smap.c	/^  char *key;$/;"	m	struct:pair	file:
+keyword_str_to_args_length	parser.c	/^smap *keyword_str_to_args_length;$/;"	v
+keyword_str_to_enum	parser.c	/^smap *keyword_str_to_enum;$/;"	v
+keywords	lexer_iso.c	/^char *keywords[] = {"and", "or", "+", "-", "*", "\/", "lt", "eq", $/;"	v
+keywords	parser.c	/^char *keywords[] = {"and", "or", "+", "-", "*", "\/", "lt", "eq", $/;"	v
+label_count	code_gen.c	/^unsigned label_count = 0;$/;"	v
+last_child	parser.h	/^    AST_lst *last_child; \/* A minor kludge to avoid O(n) insertion times. *\/$/;"	m	struct:AST
+lexer	lexer.h	/^typedef struct lexer {$/;"	s
+lexer	lexer.h	/^} lexer;$/;"	t	typeref:struct:lexer
+lookup_keyword_enum	parser.c	/^node_type lookup_keyword_enum(char *str) {$/;"	f
+main	compiler.c	/^int main(int argc, char* argv[]) {$/;"	f
+main	test.c	/^int main(int argc, char * argv[]) {$/;"	f
+malloc_failed	util/util.c	/^void malloc_failed(size_t n) {$/;"	f
+next	parser.h	/^    AST_lst *next;$/;"	m	struct:AST_lst
+node_AND	lexer_iso.c	/^			node_AND, node_OR, node_PLUS, node_MINUS, node_MUL,$/;"	e	enum:node_type	file:
+node_AND	parser.h	/^  node_AND, node_OR, node_PLUS, node_MINUS, node_MUL,$/;"	e	enum:node_type
+node_ARROW	lexer_iso.c	/^			node_STRUCT, node_ARROW, node_ASSIGN, node_IF, $/;"	e	enum:node_type	file:
+node_ARROW	parser.h	/^  node_STRUCT, node_ARROW, node_ASSIGN, node_IF, $/;"	e	enum:node_type
+node_ASSIGN	lexer_iso.c	/^			node_STRUCT, node_ARROW, node_ASSIGN, node_IF, $/;"	e	enum:node_type	file:
+node_ASSIGN	parser.h	/^  node_STRUCT, node_ARROW, node_ASSIGN, node_IF, $/;"	e	enum:node_type
+node_CALL	lexer_iso.c	/^			node_CALL \/* A call to a function *\/,$/;"	e	enum:node_type	file:
+node_CALL	parser.h	/^  node_CALL \/* A call to a function *\/,$/;"	e	enum:node_type
+node_DIV	lexer_iso.c	/^			node_LT, node_EQ, node_DIV, node_FUNCTION, $/;"	e	enum:node_type	file:
+node_DIV	parser.h	/^  node_LT, node_EQ, node_DIV, node_FUNCTION, $/;"	e	enum:node_type
+node_EQ	lexer_iso.c	/^			node_LT, node_EQ, node_DIV, node_FUNCTION, $/;"	e	enum:node_type	file:
+node_EQ	parser.h	/^  node_LT, node_EQ, node_DIV, node_FUNCTION, $/;"	e	enum:node_type
+node_FOR	lexer_iso.c	/^			node_WHILE, node_FOR, node_SEQ, node_I_PRINT, $/;"	e	enum:node_type	file:
+node_FOR	parser.h	/^  node_WHILE, node_FOR, node_SEQ, node_I_PRINT, $/;"	e	enum:node_type
+node_FUNCTION	lexer_iso.c	/^			node_LT, node_EQ, node_DIV, node_FUNCTION, $/;"	e	enum:node_type	file:
+node_FUNCTION	parser.h	/^  node_LT, node_EQ, node_DIV, node_FUNCTION, $/;"	e	enum:node_type
+node_IF	lexer_iso.c	/^			node_STRUCT, node_ARROW, node_ASSIGN, node_IF, $/;"	e	enum:node_type	file:
+node_IF	parser.h	/^  node_STRUCT, node_ARROW, node_ASSIGN, node_IF, $/;"	e	enum:node_type
+node_INT	lexer_iso.c	/^typedef enum node_type {node_INT \/* integer literal *\/,$/;"	e	enum:node_type	file:
+node_INT	parser.h	/^  node_INT \/* integer literal *\/,$/;"	e	enum:node_type
+node_I_PRINT	lexer_iso.c	/^			node_WHILE, node_FOR, node_SEQ, node_I_PRINT, $/;"	e	enum:node_type	file:
+node_I_PRINT	parser.h	/^  node_WHILE, node_FOR, node_SEQ, node_I_PRINT, $/;"	e	enum:node_type
+node_LT	lexer_iso.c	/^			node_LT, node_EQ, node_DIV, node_FUNCTION, $/;"	e	enum:node_type	file:
+node_LT	parser.h	/^  node_LT, node_EQ, node_DIV, node_FUNCTION, $/;"	e	enum:node_type
+node_MINUS	lexer_iso.c	/^			node_AND, node_OR, node_PLUS, node_MINUS, node_MUL,$/;"	e	enum:node_type	file:
+node_MINUS	parser.h	/^  node_AND, node_OR, node_PLUS, node_MINUS, node_MUL,$/;"	e	enum:node_type
+node_MUL	lexer_iso.c	/^			node_AND, node_OR, node_PLUS, node_MINUS, node_MUL,$/;"	e	enum:node_type	file:
+node_MUL	parser.h	/^  node_AND, node_OR, node_PLUS, node_MINUS, node_MUL,$/;"	e	enum:node_type
+node_OR	lexer_iso.c	/^			node_AND, node_OR, node_PLUS, node_MINUS, node_MUL,$/;"	e	enum:node_type	file:
+node_OR	parser.h	/^  node_AND, node_OR, node_PLUS, node_MINUS, node_MUL,$/;"	e	enum:node_type
+node_PLUS	lexer_iso.c	/^			node_AND, node_OR, node_PLUS, node_MINUS, node_MUL,$/;"	e	enum:node_type	file:
+node_PLUS	parser.h	/^  node_AND, node_OR, node_PLUS, node_MINUS, node_MUL,$/;"	e	enum:node_type
+node_READ_INT	lexer_iso.c	/^			node_S_PRINT, node_READ_INT} node_type;$/;"	e	enum:node_type	file:
+node_READ_INT	parser.h	/^  node_S_PRINT, node_READ_INT} node_type;$/;"	e	enum:node_type
+node_SEQ	lexer_iso.c	/^			node_WHILE, node_FOR, node_SEQ, node_I_PRINT, $/;"	e	enum:node_type	file:
+node_SEQ	parser.h	/^  node_WHILE, node_FOR, node_SEQ, node_I_PRINT, $/;"	e	enum:node_type
+node_STRING	lexer_iso.c	/^			node_STRING \/* string literal*\/,$/;"	e	enum:node_type	file:
+node_STRING	parser.h	/^  node_STRING \/* string literal*\/,$/;"	e	enum:node_type
+node_STRUCT	lexer_iso.c	/^			node_STRUCT, node_ARROW, node_ASSIGN, node_IF, $/;"	e	enum:node_type	file:
+node_STRUCT	parser.h	/^  node_STRUCT, node_ARROW, node_ASSIGN, node_IF, $/;"	e	enum:node_type
+node_S_PRINT	lexer_iso.c	/^			node_S_PRINT, node_READ_INT} node_type;$/;"	e	enum:node_type	file:
+node_S_PRINT	parser.h	/^  node_S_PRINT, node_READ_INT} node_type;$/;"	e	enum:node_type
+node_VAR	lexer_iso.c	/^			node_VAR \/* Name of a variable or a function. *\/,$/;"	e	enum:node_type	file:
+node_VAR	parser.h	/^  node_VAR \/* Name of a variable or a function. *\/,$/;"	e	enum:node_type
+node_WHILE	lexer_iso.c	/^			node_WHILE, node_FOR, node_SEQ, node_I_PRINT, $/;"	e	enum:node_type	file:
+node_WHILE	parser.h	/^  node_WHILE, node_FOR, node_SEQ, node_I_PRINT, $/;"	e	enum:node_type
+node_type	lexer_iso.c	/^			node_S_PRINT, node_READ_INT} node_type;$/;"	t	typeref:enum:node_type	file:
+node_type	lexer_iso.c	/^typedef enum node_type {node_INT \/* integer literal *\/,$/;"	g	file:
+node_type	parser.h	/^  node_S_PRINT, node_READ_INT} node_type;$/;"	t	typeref:enum:node_type
+node_type	parser.h	/^typedef enum node_type {$/;"	g
+num_args	parser.c	/^smap *num_args;$/;"	v
+num_buckets	util/smap.c	/^  size_t num_buckets;$/;"	m	struct:smap	file:
+num_pairs	util/smap.c	/^  size_t num_pairs;$/;"	m	struct:bucket	file:
+num_pairs	util/smap.c	/^  size_t num_pairs;$/;"	m	struct:smap	file:
+num_top_level_asts	compiler.c	/^size_t num_top_level_asts = 0;$/;"	v
+open_file	lexer.c	/^void open_file(lexer *lex, char *filename) {$/;"	f
+open_file	lexer_iso.c	/^void open_file(lexer *lex, char *filename) {$/;"	f
+pair	util/smap.c	/^typedef struct pair {$/;"	s	file:
+pair	util/smap.c	/^} pair;$/;"	t	typeref:struct:pair	file:
+pairs	util/smap.c	/^  pair *pairs;$/;"	m	struct:bucket	file:
+parse_close	parser.c	/^void parse_close() {$/;"	f
+parse_init	parser.c	/^void parse_init() {$/;"	f
+peek_type	lexer.c	/^token_type peek_type(lexer *lex) {$/;"	f
+peek_type	lexer_iso.c	/^token_type peek_type(lexer *lex) {$/;"	f
+peek_value	lexer.c	/^char *peek_value(lexer *lex) {$/;"	f
+peek_value	lexer_iso.c	/^char *peek_value(lexer *lex) {$/;"	f
+read_token	lexer.c	/^void read_token(lexer *lex) {$/;"	f
+read_token	lexer_iso.c	/^void read_token(lexer *lex) {$/;"	f
+safe_calloc	util/util.c	/^void *safe_calloc(size_t n) {$/;"	f
+safe_malloc	util/util.c	/^void *safe_malloc(size_t n) {$/;"	f
+safe_realloc	util/util.c	/^void *safe_realloc(void *ptr, size_t n) {$/;"	f
+smap	util/smap.c	/^struct smap {$/;"	s	file:
+smap	util/smap.h	/^typedef struct smap smap;$/;"	t	typeref:struct:smap
+smap_del	util/smap.c	/^void smap_del(smap *map) {$/;"	f
+smap_del_contents	util/smap.c	/^void smap_del_contents(smap *map) {$/;"	f
+smap_get	util/smap.c	/^int smap_get(smap *map, char *key) {$/;"	f
+smap_get_extended	util/smap.c	/^int smap_get_extended(smap *map, char *key, int *success) {$/;"	f
+smap_increment	util/smap.c	/^void smap_increment(smap *map, char *key, int amt) {$/;"	f
+smap_new	util/smap.c	/^smap *smap_new() {$/;"	f
+smap_put	util/smap.c	/^void smap_put(smap *map, char *key, int value) {$/;"	f
+stack_sizes	parser.c	/^smap *stack_sizes;$/;"	v
+strings	parser.c	/^smap *strings;$/;"	v
+text_seg_opened	code_gen.c	/^int text_seg_opened = 0;$/;"	v
+token_CLOSE_PAREN	lexer.h	/^  token_CLOSE_PAREN \/* ')' *\/,$/;"	e	enum:token_type
+token_END	lexer.h	/^  token_END \/* end of file *\/,$/;"	e	enum:token_type
+token_INT	lexer.h	/^  token_INT \/* integer literal *\/,$/;"	e	enum:token_type
+token_KEYWORD	lexer.h	/^  token_KEYWORD \/* keyword *\/,$/;"	e	enum:token_type
+token_NAME	lexer.h	/^  token_NAME \/* variable or function name *\/,$/;"	e	enum:token_type
+token_OPEN_PAREN	lexer.h	/^  token_OPEN_PAREN \/* '(' *\/,$/;"	e	enum:token_type
+token_SENTINEL	lexer.h	/^  token_SENTINEL \/* 'special' value *\/} token_type;$/;"	e	enum:token_type
+token_STRING	lexer.h	/^  token_STRING \/* string literal*\/,$/;"	e	enum:token_type
+token_type	lexer.h	/^  token_SENTINEL \/* 'special' value *\/} token_type;$/;"	t	typeref:enum:token_type
+token_type	lexer.h	/^typedef enum token_type {$/;"	g
+tokens_to_string	test.c	/^char * tokens_to_string[] = { "INT",$/;"	v
+top_level_asts	compiler.c	/^AST **top_level_asts = NULL;$/;"	v
+top_level_asts_cap	compiler.c	/^size_t top_level_asts_cap = 0;$/;"	v
+type	lexer.h	/^    token_type type;$/;"	m	struct:lexer
+type	parser.h	/^    node_type type; \/* The type of  *\/$/;"	m	struct:AST
+usage	compiler.c	/^void usage() {$/;"	f
+val	parser.h	/^    AST *val;$/;"	m	struct:AST_lst
+val	parser.h	/^    char *val; \/* The source text which spawned this node. *\/ $/;"	m	struct:AST
+val	util/smap.c	/^  int val;$/;"	m	struct:pair	file:
+white	lexer.c	/^int white(char curr_char) {$/;"	f
+white	lexer_iso.c	/^int white(char curr_char) {$/;"	f

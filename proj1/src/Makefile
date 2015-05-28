@@ -23,7 +23,7 @@ default: compile
 compile: ../lifcc
 
 ../lifcc: $(SRCS)
-	$(CC) $(CFLAGS) -o $@ $(SRCS)
+	$(CC) $(CFLAGS) -o $@ $(SRCS) -lm
 
 check: 
 	$(MAKE) -C .. check

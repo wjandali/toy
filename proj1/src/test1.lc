@@ -1,0 +1,4 @@
+(assign n "First string")
+(assign k "second string")
+(function (ka a1 a2) (assign n "fafiaj"))
+(assign a (arrow (struct 1 2 "fuck" "shit") 3))

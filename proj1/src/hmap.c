@@ -1,4 +1,4 @@
-#include "smap.h"
+#include "hmap.h"
 #include "util.h"
 #include <stdlib.h>
 
@@ -22,7 +22,7 @@ typedef struct bucket {
   size_t num_pairs;
 } bucket;
 
-struct smap {
+struct hmap {
   bucket *buckets;
   size_t num_buckets;
   size_t num_pairs;
@@ -35,9 +35,9 @@ size_t hash_string(char *str);
 void bucket_insert(bucket *buck, char *str, int val);
 
 /** Doubles the capacity of MAP, and rehashes its contents so that nothing is lost. */
-void expand(smap *map);
+void expand(hmap *map);
 
-void smap_put(smap *map, char *key, int value) {
+void hmap_put(hmap *map, char *key, int value) {
   if (!map) {
     return;
   }
@@ -55,16 +55,16 @@ void smap_put(smap *map, char *key, int value) {
     map->num_pairs += 1;
   } else {
     expand(map);
-    smap_put(map, key, value);
+    hmap_put(map, key, value);
   }
 }
 
-int smap_get(smap *map, char *key) {
+int hmap_get(hmap *map, char *key) {
   int tmp;
-  return smap_get_extended(map, key, &tmp);
+  return hmap_get_extended(map, key, &tmp);
 }
 
-int smap_get_extended(smap *map, char *key, int *success) {
+int hmap_get_extended(hmap *map, char *key, int *success) {
   if (!map) {
     *success = 0;
     return -1;
@@ -80,15 +80,15 @@ int smap_get_extended(smap *map, char *key, int *success) {
   return -1;
 }
 
-smap *smap_new() {
-  smap *ret = safe_malloc(sizeof(smap));
+hmap *hmap_new() {
+  hmap *ret = safe_malloc(sizeof(hmap));
   ret->num_buckets = INIT_CAPACITY;
   ret->num_pairs = 0;
   ret->buckets = safe_calloc(ret->num_buckets * sizeof(bucket));
   return ret;
 }
 
-void smap_del(smap *map) {
+void hmap_del(hmap *map) {
   if (!map) {
     return;
   }
@@ -121,7 +121,7 @@ void bucket_insert(bucket *buck, char *str, int val) {
   buck->num_pairs += 1;
 }
 
-void expand(smap *map) {
+void expand(hmap *map) {
   bucket* old_buckets = map->buckets;
   size_t old_num_buckets = map->num_buckets;
   map->buckets = safe_calloc(map->num_buckets * 2 * sizeof(bucket));
@@ -130,7 +130,7 @@ void expand(smap *map) {
   for (size_t i = 0; i < old_num_buckets; i += 1) {
     bucket *cur_bucket = old_buckets + i;
     for (size_t j = 0; j < cur_bucket->num_pairs; j += 1)  {
-      smap_put(map, 
+      hmap_put(map, 
           cur_bucket->pairs[j].key, 
           cur_bucket->pairs[j].val);
     }
@@ -141,17 +141,17 @@ void expand(smap *map) {
   free(old_buckets);
 }
 
-void smap_increment(smap *map, char *key, int amt) {
+void hmap_increment(hmap *map, char *key, int amt) {
   int already_contains = 1;
-  int val = smap_get_extended(map, key, &already_contains);
+  int val = hmap_get_extended(map, key, &already_contains);
   if (already_contains) {
-    smap_put(map, key, val + amt);
+    hmap_put(map, key, val + amt);
   } else {
-    smap_put(map, key, amt);
+    hmap_put(map, key, amt);
   }
 }
 
-void smap_del_contents(smap *map) {
+void hmap_del_contents(hmap *map) {
   for (size_t i = 0; i < map->num_buckets; i += 1) {
     for (size_t j = 0; j < map->buckets[i].num_pairs; j += 1) {
       free(map->buckets[i].pairs[j].key);

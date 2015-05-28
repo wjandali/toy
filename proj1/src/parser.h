@@ -5,16 +5,17 @@
 #include "util/util.h"
 #include "lexer.h"
 
-typedef enum node_type {node_INT /* integer literal */,
-			node_STRING /* string literal*/,
-			node_VAR /* Name of a variable or a function. */,
-			node_CALL /* A call to a function */,
-			/* The different built-in utilitites. */
-			node_AND, node_OR, node_PLUS, node_MINUS, node_MUL,
-			node_LT, node_EQ, node_DIV, node_FUNCTION, 
-			node_STRUCT, node_ARROW, node_ASSIGN, node_IF, 
-			node_WHILE, node_FOR, node_SEQ, node_I_PRINT, 
-			node_S_PRINT, node_READ_INT} node_type;
+typedef enum node_type {
+  node_INT /* integer literal */,
+  node_STRING /* string literal*/,
+  node_VAR /* Name of a variable or a function. */,
+  node_CALL /* A call to a function */,
+  /* The different built-in utilitites. */
+  node_AND, node_OR, node_PLUS, node_MINUS, node_MUL,
+  node_LT, node_EQ, node_DIV, node_FUNCTION, 
+  node_STRUCT, node_ARROW, node_ASSIGN, node_IF, 
+  node_WHILE, node_FOR, node_SEQ, node_I_PRINT, 
+  node_S_PRINT, node_READ_INT} node_type;
 
 typedef struct AST AST;
 typedef struct AST_lst AST_lst;

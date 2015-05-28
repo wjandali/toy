@@ -1,0 +1,38 @@
+consider (* (/ 5 2) (+ 3 (* 9 2)))
+
+                        *
+                      /    +
+                    5  2  3  *
+                           9   2
+
+lexer is initiated, we peek the type and get '('
+when a ( is detected we create an AST node from the next token,
+// AST(*)
+and while the next read token is not ')' we append children to our node's
+list of children,
+so, read next token which is '(', set current node's child to
+recursive call 
+
+  so we have a call and our read token is '(', so we create AST(/)
+  and while next token is not ')' we read and react. next token is 
+  int(5) so we append to list of children nodes of AST(/),
+  then read again and get int(2) and append it and we return AST(/)--5, 2
+  upon reaching closed parenthesis, but we must read again since we don't
+  want this parenthesis confused for the outer one for the outerloop
+
+read again, and again we get '(' so append to child node list the recursive call, ultimately exiting
+
+we read and get ')', so we read again and return our current AST
+
+
+parser:
+  if parenthesis, node is second character
+  while parenthesis open,
+  childarray.append(parser(lexer))
+
+  else node is first character and return
+
+              *
+            /    +
+          5  2  3  *
+                  9  2
