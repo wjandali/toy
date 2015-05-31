@@ -37,6 +37,8 @@ void bucket_insert(bucket *buck, char *str, int val);
 /** Doubles the capacity of MAP, and rehashes its contents so that nothing is lost. */
 void expand(smap *map);
 
+void get_keys(smap *map);
+
 void smap_put(smap *map, char *key, int value) {
   if (!map) {
     return;
@@ -155,6 +157,19 @@ void smap_del_contents(smap *map) {
   for (size_t i = 0; i < map->num_buckets; i += 1) {
     for (size_t j = 0; j < map->buckets[i].num_pairs; j += 1) {
       free(map->buckets[i].pairs[j].key);
+    }
+  }
+}
+
+void get_keys(smap *map) {
+  printf("start printing");
+  bucket *buck;
+  pair *pa;
+  for (int i = 0; i < map->num_buckets; i++) {
+    buck = map->buckets + i;
+    for (int j = 0; j < buck->num_pairs; j++) {
+      pa = buck->pairs + j;
+      printf("%s\n", pa->key);
     }
   }
 }

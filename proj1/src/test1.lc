@@ -2,3 +2,5 @@
 (assign k "second string")
 (function (ka a1 a2) (assign n "fafiaj"))
 (assign a (arrow (struct 1 2 "fuck" "shit") 3))
+(assign b (struct 2 4 "fart" 3))
+(assign c (struct b 2 b))

@@ -1,7 +1,6 @@
 #include "code_gen.h"
 #include "parser.h"
 #include <stdlib.h>
-#include <math.h>
 
 /** A counter to prevent the issuance of duplicate labels. */
 unsigned label_count = 1;
@@ -10,6 +9,8 @@ int data_seg_opened = 0;
 /** True iff the text segment has already been partially printed. */
 int text_seg_opened = 0;
 char *space = "   ";  
+
+void get_keys(smap *map);
 
 void emit_strings(AST *ast) {
     /* TODO: Implement me. */
@@ -55,36 +56,10 @@ void emit_static_memory() {
   /*   i have a hashmap of vars to check if they exist, if struct refers to one or one is encountered we can throw, */
   /*     and vars are labeled $VAR */
   /*   so we have struct1 int3 int5 $n string1 */
-  AST_lst *child;
-  switch(ast->type) {
-    case node_ASSIGN:
-      child = ast->children;
-      printf("$%s: .word 0\n", child->next->val->val); // print the label for the var
-      child = child->next;
-      while (child != NULL) {
-        emit_static_memory(child->val);
-        child = child->next;
-      }
-      label_count++;
-      return;
-    case node_STRUCT:
-      child = ast->children;
-      printf("$struct%d: .word ", label_count); // print the label for the var
-      label_count++;
-      while (child != NULL) {
-        emit_static_memory(child->val);
-        child = child->next;
-        printf("0 ");
-      }
-      printf("\n");
-      return;
-    case node_CALL:
-    case node_FUNCTION:
-      return;
-    default:
-      return;
-  }
+  get_keys(decls);
+
 }
+
 
 void emit_main(AST *ast) {
     /* TODO: Implement me. */
