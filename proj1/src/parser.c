@@ -130,7 +130,6 @@ AST *build_ast (lexer *lex) {
         }
       }
       strcpy(tree->val, lex->buffer);
-      printf("inside paren with: %s\n", lex->buffer);
       read_token(lex);
 
       while(peek_type(lex) != token_CLOSE_PAREN && peek_type(lex) != token_END) { 
@@ -156,12 +155,10 @@ AST *build_ast (lexer *lex) {
     case token_STRING:
       tree->type = node_STRING;
       strcpy(tree->val, lex->buffer);
-      printf("token string %s\n", lex->buffer);
       break;
     case token_NAME:
       tree->type = node_VAR;
       strcpy(tree->val, lex->buffer);
-      printf("token name with: %s\n", lex->buffer);
       break;
     case token_KEYWORD:
       fatal_error("token must be wrapped in parentheses");
@@ -234,8 +231,7 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
       if (is_top_level) {
         smap_put(decls, ast->children->val->val, 1);
         if (ast->children->next->val->type == node_STRUCT) {
-          printf("detected struct");
-          struct_p = (char *) safe_calloc((int) log10(struct_count) + 9);
+          struct_p = (char *) safe_calloc(((int) log10(struct_count) + 9)*sizeof(char));
           sprintf(struct_p, "$struct%d", struct_count);
           struct_count++;
           smap_put(decls, struct_p, AST_lst_len(ast->children->next->val->children)); 
@@ -273,7 +269,9 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
       /* (function (func arg1 arg2..) (* arg1 arg2)) */
       args = ast->children->val->children; //
       /* set func at the top level */
-      smap_put(decls, ast->children->val->val, 1); // set func name
+      struct_p = (char *) safe_calloc((strlen(ast->children->val->val) + 7)*sizeof(char));
+      sprintf(struct_p, "$func_%s", ast->children->val->val);
+      smap_put(decls, struct_p, 1); // set func name
       while (args != NULL) { 
         smap_put(func_decls, args->val->val, 1); // set function level assignment for each arg
         args = args->next;
@@ -295,7 +293,6 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
 }
 
 node_type lookup_keyword_enum(char *str) {
-  printf("looking up %s\n", str);
   if (smap_get(keyword_str_to_enum, keywords[0]) == -1) {
     initialize_keyword_to_enum_mapping();
   }

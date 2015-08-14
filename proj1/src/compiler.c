@@ -54,7 +54,6 @@ void compile(char *filename) {
   for (size_t i = 0; i < num_top_level_asts; i += 1) {
     emit_strings(top_level_asts[i]);
   }
-  printf("here");
   emit_static_memory();
   for (size_t i = 0; i < num_top_level_asts; i += 1) {
     emit_main(top_level_asts[i]);

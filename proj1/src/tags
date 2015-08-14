@@ -15,10 +15,13 @@ CODE_GEN_H	code_gen.h	2;"	d
 HMAP_H	hmap.h	2;"	d
 INIT_BUFFER_SIZE	lexer.c	8;"	d	file:
 INIT_BUFFER_SIZE	lexer_iso.c	9;"	d	file:
+INIT_CAPACITY	hmap.c	10;"	d	file:
 INIT_CAPACITY	util/smap.c	10;"	d	file:
 LEXER_H	lexer.h	2;"	d
+LOAD_FACTOR	hmap.c	7;"	d	file:
 LOAD_FACTOR	util/smap.c	7;"	d	file:
 MAX	compiler.c	11;"	d	file:
+MAX	hmap.c	12;"	d	file:
 MAX	util/smap.c	12;"	d	file:
 OP_TOKENS	lexer.c	10;"	d	file:
 PARSER_H	parser.h	2;"	d
@@ -29,13 +32,18 @@ TOTAL_TOKENS	lexer.c	9;"	d	file:
 UTIL_H	util/util.h	2;"	d
 append_ast_to_top_level	compiler.c	/^void append_ast_to_top_level(AST *ast) {$/;"	f
 args_length	parser.c	/^int args_length[] = {2, 2, 2, 2, 2, 2, 2, 2, 2, -2, 2, 2, 3, 2, 4, -2, 1, 1, 0};$/;"	v
+bucket	hmap.c	/^typedef struct bucket {$/;"	s	file:
+bucket	hmap.c	/^} bucket;$/;"	t	typeref:struct:bucket	file:
 bucket	util/smap.c	/^typedef struct bucket {$/;"	s	file:
 bucket	util/smap.c	/^} bucket;$/;"	t	typeref:struct:bucket	file:
+bucket_insert	hmap.c	/^void bucket_insert(bucket *buck, char *str, int val) {$/;"	f
 bucket_insert	util/smap.c	/^void bucket_insert(bucket *buck, char *str, int val) {$/;"	f
+buckets	hmap.c	/^  bucket *buckets;$/;"	m	struct:hmap	file:
 buckets	util/smap.c	/^  bucket *buckets;$/;"	m	struct:smap	file:
 buff_len	lexer.h	/^    size_t buff_len;$/;"	m	struct:lexer
 buffer	lexer.h	/^    char *buffer;$/;"	m	struct:lexer
 build_ast	parser.c	/^AST *build_ast (lexer *lex) {$/;"	f
+capacity	hmap.c	/^  size_t capacity;$/;"	m	struct:bucket	file:
 capacity	util/smap.c	/^  size_t capacity;$/;"	m	struct:bucket	file:
 check_sub_tree	parser.c	/^void check_sub_tree(AST *ptr) {$/;"	f
 check_tree_shape	parser.c	/^void check_tree_shape(AST *ptr) {$/;"	f
@@ -51,24 +59,35 @@ emit_main	code_gen.c	/^void emit_main(AST *ast) {$/;"	f
 emit_static_memory	code_gen.c	/^void emit_static_memory() {$/;"	f
 emit_strings	code_gen.c	/^void emit_strings(AST *ast) {$/;"	f
 enums	parser.c	/^int enums[] = {node_AND, node_OR, node_PLUS, node_MINUS, node_MUL, node_DIV,$/;"	v
+expand	hmap.c	/^void expand(hmap *map) {$/;"	f
 expand	util/smap.c	/^void expand(smap *map) {$/;"	f
 fatal_error	util/util.c	/^void fatal_error(char* msg) {$/;"	f
 file	lexer.h	/^    FILE *file;$/;"	m	struct:lexer
 free_ast	parser.c	/^void free_ast (AST *ptr) {$/;"	f
-func_decls	parser.c	/^smap *func_decls;$/;"	v
 gather_decls	parser.c	/^void gather_decls(AST *ast, char *env, int is_top_level) {$/;"	f
+get_keys	util/smap.c	/^void get_keys(smap *map) {$/;"	f
+hash_string	hmap.c	/^size_t hash_string(char *str) {$/;"	f
 hash_string	util/smap.c	/^size_t hash_string(char *str) {$/;"	f
+hmap	hmap.c	/^struct hmap {$/;"	s	file:
 hmap	hmap.h	/^typedef struct hmap hmap;$/;"	t	typeref:struct:hmap
+hmap_del	hmap.c	/^void hmap_del(hmap *map) {$/;"	f
+hmap_del_contents	hmap.c	/^void hmap_del_contents(hmap *map) {$/;"	f
+hmap_get	hmap.c	/^int hmap_get(hmap *map, char *key) {$/;"	f
+hmap_get_extended	hmap.c	/^int hmap_get_extended(hmap *map, char *key, int *success) {$/;"	f
+hmap_increment	hmap.c	/^void hmap_increment(hmap *map, char *key, int amt) {$/;"	f
+hmap_new	hmap.c	/^hmap *hmap_new() {$/;"	f
+hmap_put	hmap.c	/^void hmap_put(hmap *map, char *key, int value) {$/;"	f
 init_extras	parser.c	/^void init_extras() {$/;"	f
 init_lex	lexer.c	/^void init_lex(lexer *luthor) {$/;"	f
 init_lex	lexer_iso.c	/^void init_lex(lexer *luthor) {$/;"	f
 initialize_keyword_to_enum_mapping	parser.c	/^void initialize_keyword_to_enum_mapping() {$/;"	f
+key	hmap.c	/^  char *key;$/;"	m	struct:pair	file:
 key	util/smap.c	/^  char *key;$/;"	m	struct:pair	file:
 keyword_str_to_args_length	parser.c	/^smap *keyword_str_to_args_length;$/;"	v
 keyword_str_to_enum	parser.c	/^smap *keyword_str_to_enum;$/;"	v
 keywords	lexer_iso.c	/^char *keywords[] = {"and", "or", "+", "-", "*", "\/", "lt", "eq", $/;"	v
 keywords	parser.c	/^char *keywords[] = {"and", "or", "+", "-", "*", "\/", "lt", "eq", $/;"	v
-label_count	code_gen.c	/^unsigned label_count = 0;$/;"	v
+label_count	code_gen.c	/^unsigned label_count = 1;$/;"	v
 last_child	parser.h	/^    AST_lst *last_child; \/* A minor kludge to avoid O(n) insertion times. *\/$/;"	m	struct:AST
 lexer	lexer.h	/^typedef struct lexer {$/;"	s
 lexer	lexer.h	/^} lexer;$/;"	t	typeref:struct:lexer
@@ -128,14 +147,20 @@ node_type	lexer_iso.c	/^typedef enum node_type {node_INT \/* integer literal *\/
 node_type	parser.h	/^  node_S_PRINT, node_READ_INT} node_type;$/;"	t	typeref:enum:node_type
 node_type	parser.h	/^typedef enum node_type {$/;"	g
 num_args	parser.c	/^smap *num_args;$/;"	v
+num_buckets	hmap.c	/^  size_t num_buckets;$/;"	m	struct:hmap	file:
 num_buckets	util/smap.c	/^  size_t num_buckets;$/;"	m	struct:smap	file:
+num_pairs	hmap.c	/^  size_t num_pairs;$/;"	m	struct:bucket	file:
+num_pairs	hmap.c	/^  size_t num_pairs;$/;"	m	struct:hmap	file:
 num_pairs	util/smap.c	/^  size_t num_pairs;$/;"	m	struct:bucket	file:
 num_pairs	util/smap.c	/^  size_t num_pairs;$/;"	m	struct:smap	file:
 num_top_level_asts	compiler.c	/^size_t num_top_level_asts = 0;$/;"	v
 open_file	lexer.c	/^void open_file(lexer *lex, char *filename) {$/;"	f
 open_file	lexer_iso.c	/^void open_file(lexer *lex, char *filename) {$/;"	f
+pair	hmap.c	/^typedef struct pair {$/;"	s	file:
+pair	hmap.c	/^} pair;$/;"	t	typeref:struct:pair	file:
 pair	util/smap.c	/^typedef struct pair {$/;"	s	file:
 pair	util/smap.c	/^} pair;$/;"	t	typeref:struct:pair	file:
+pairs	hmap.c	/^  pair *pairs;$/;"	m	struct:bucket	file:
 pairs	util/smap.c	/^  pair *pairs;$/;"	m	struct:bucket	file:
 parse_close	parser.c	/^void parse_close() {$/;"	f
 parse_init	parser.c	/^void parse_init() {$/;"	f
@@ -157,8 +182,10 @@ smap_get_extended	util/smap.c	/^int smap_get_extended(smap *map, char *key, int 
 smap_increment	util/smap.c	/^void smap_increment(smap *map, char *key, int amt) {$/;"	f
 smap_new	util/smap.c	/^smap *smap_new() {$/;"	f
 smap_put	util/smap.c	/^void smap_put(smap *map, char *key, int value) {$/;"	f
+space	code_gen.c	/^char *space = "   ";  $/;"	v
 stack_sizes	parser.c	/^smap *stack_sizes;$/;"	v
 strings	parser.c	/^smap *strings;$/;"	v
+struct_count	parser.c	/^int struct_count = 1;$/;"	v
 text_seg_opened	code_gen.c	/^int text_seg_opened = 0;$/;"	v
 token_CLOSE_PAREN	lexer.h	/^  token_CLOSE_PAREN \/* ')' *\/,$/;"	e	enum:token_type
 token_END	lexer.h	/^  token_END \/* end of file *\/,$/;"	e	enum:token_type
@@ -176,6 +203,7 @@ top_level_asts_cap	compiler.c	/^size_t top_level_asts_cap = 0;$/;"	v
 type	lexer.h	/^    token_type type;$/;"	m	struct:lexer
 type	parser.h	/^    node_type type; \/* The type of  *\/$/;"	m	struct:AST
 usage	compiler.c	/^void usage() {$/;"	f
+val	hmap.c	/^  int val;$/;"	m	struct:pair	file:
 val	parser.h	/^    AST *val;$/;"	m	struct:AST_lst
 val	parser.h	/^    char *val; \/* The source text which spawned this node. *\/ $/;"	m	struct:AST
 val	util/smap.c	/^  int val;$/;"	m	struct:pair	file:

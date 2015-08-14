@@ -162,14 +162,25 @@ void smap_del_contents(smap *map) {
 }
 
 void get_keys(smap *map) {
-  printf("start printing");
   bucket *buck;
   pair *pa;
+  int c;
   for (int i = 0; i < map->num_buckets; i++) {
     buck = map->buckets + i;
     for (int j = 0; j < buck->num_pairs; j++) {
       pa = buck->pairs + j;
-      printf("%s\n", pa->key);
+      /* we're dealing with a struct if it starts with a dollar sign */
+      if (strcmp(pa->key, "$struct") == 0) {
+        printf("%s: .word", pa->key);
+        c = 0;
+        while (c < pa->val) {
+          printf(" 0");
+          c++;
+        }
+        printf("\n");
+      } else if (*pa->key != '$') {
+        printf("%s: .word 0\n", pa->key);
+      }
     }
   }
 }
