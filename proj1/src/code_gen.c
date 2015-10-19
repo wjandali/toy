@@ -9,14 +9,14 @@ int data_seg_opened = 0;
 /** True iff the text segment has already been partially printed. */
 int text_seg_opened = 0;
 int main_seg_opened = 0;
-char *space = "   ";  
+int branch_counter = 0;
+char *space = "     ";  
 
 void get_keys(smap *map);
 
 void emit_strings(AST *ast) {
     /* TODO: Implement me. */
   if (!data_seg_opened) {
-    printf("%s", space);
     printf(".data\n");
     data_seg_opened = 1;
   }
@@ -64,31 +64,162 @@ void emit_static_memory() {
 void emit_main(AST *ast) {
     /* TODO: Implement me. */
   /* for any ast that isn't  function we execute it */
+  int arg_count;
+  AST_lst *ast_marker;
   if (!main_seg_opened) {
-    printf("\n%s", space);
-    printf(".text\n");
-    printf("%s", space);
-    printf(".global main\n");
-    printf("main:\n");
+    printf("\n.text\n");
+    printf("\n.global main\n");
+    printf("\nmain:\n");
     main_seg_opened = 1;
   }
   switch(ast->type) {
     case node_INT:
+      printf("    addi $v0, $0, %s\n", ast->val);
+      return;
     case node_STRING:
+      printf("    la $v0, %s\n", ast->val);
+      printf("\n");
+      return;
     case node_VAR:
+      // all global variables have an address associated with them
+      printf("    la $v0, %s\n", ast->val);
+      printf("    lw $v0, 0($v0)\n");
+      printf("\n");
+      return;
     case node_CALL:
+      // count the number of arguments
+      arg_count = 0;
+      ast_marker = ast->children;
+      while (ast_marker != NULL) {
+        arg_count++;
+        ast_marker = ast_marker->next;
+      }
+      printf("    addi $sp, $sp, -%d\n", arg_count*4);
+      ast_marker = ast->children;
+      arg_count = 0;
+      while (ast_marker != NULL) {
+        emit_main(ast_marker->val);
+        printf("    sw $v0, %d($sp)\n", arg_count*4);
+        arg_count++;
+        ast_marker = ast_marker->next;
+      }
+      printf("    jal %s\n", ast->val);
+      printf("    addi $sp, $sp, %d\n", arg_count*4);
+      printf("\n");
+      return;
+      // needs function def hash
     case node_AND:
+      // we check if the first argument is false
+      // if so, jump down to return false
+      // the next line checks if the next argument is false
+      // if so, jump down to return false
+      // branch to return true
+      emit_main(ast->children->val);
+      printf("    beq $v0, $0, $short_to_false%d\n", branch_counter);
+      emit_main(ast->last_child->val);
+      printf("    beq $v0, $0, $short_to_false%d\n", branch_counter);
+      printf("    j $short_to_true%d\n", branch_counter); // $v0 contains the second value
+      printf("\n");
+      printf("$short_to_false%d:\n", branch_counter);
+      printf("    add $v0, $0, $0\n");
+      printf("    j $branch_end%d\n", branch_counter);
+      printf("\n");
+      printf("$short_to_true%d:\n", branch_counter);
+      printf("    addi $v0, $0, 1\n");
+      printf("\n");
+      printf("$branch_end%d:\n", branch_counter);
+      branch_counter++;
+      return;
     case node_OR:
+      // check if the first argument is true, and if so jump to the end
+      emit_main(ast->children->val);
+      printf("    bne $v0, $0, $short_to_true%d\n", branch_counter);
+      emit_main(ast->last_child->val);
+      printf("    beq $v0, $0, $short_to_false%d\n", branch_counter);
+      printf("$short_to_true%d:\n", branch_counter);
+      printf("    addi $v0, $0, 1\n");
+      printf("    j $branch_end%d\n", branch_counter);
+      printf("$short_to_false%d:\n", branch_counter);
+      printf("    add $v0, $0, $0\n");
+      printf("$branch_end%d:\n", branch_counter);
+      branch_counter++;
+      return;
     case node_PLUS:
+      emit_main(ast->children->val);
+      printf("    add $t0, $v0, $0\n");
+      emit_main(ast->last_child->val);
+      printf("    add $v0, $t0, $v0\n");
+      printf("\n");
+      return;
     case node_MINUS:
+      emit_main(ast->children->val);
+      printf("    add $t0, $v0, $0\n");
+      emit_main(ast->last_child->val);
+      printf("    sub $v0, $t0, $v0\n");
+      printf("\n");
+      return;
     case node_MUL:
+      emit_main(ast->children->val);
+      printf("    add $t0, $v0, $0\n");
+      emit_main(ast->last_child->val);
+      printf("    mul $t0, $v0\n");
+      printf("    mflo $v0\n");
+      printf("\n");
+      return;
     case node_LT:
+      emit_main(ast->children->val);
+      printf("    add $t0, $v0, $0\n");
+      emit_main(ast->last_child->val);
+      printf("    slt $v0, $t0, $v0");
+      return;
     case node_EQ:
+      emit_main(ast->children->val);
+      printf("    add $t0, $v0, $0\n");
+      emit_main(ast->last_child->val);
+      printf("    beq $t0, $v0, $short_to_true%d\n", branch_counter);
+      printf("    add $v0, $0, $0\n");
+      printf("    j $branch_end%d\n", branch_counter);
+      printf("    $short_to_true%d:\n", branch_counter);
+      printf("    addi $v0, $0, 1\n");
+      printf("    $branch_end%d:\n", branch_counter);
+      branch_counter++;
+      return;
     case node_DIV:
+      emit_main(ast->children->val);
+      printf("    add $t0, $v0, $0\n");
+      emit_main(ast->last_child->val);
+      printf("    div $t0, $v0\n");
+      printf("    mflo $v0\n");
+      printf("\n");
+      return;
     case node_FUNCTION:
+      return;
     case node_STRUCT:
+      // any main struct has allocated address space associated with it
+      printf("    la $v1, %s\n", ast->val);
+      arg_count = 0;
+      ast_marker = ast->children;
+      while (ast_marker != NULL) {
+        emit_main(ast->children->val);
+        printf("    sw $v0, %d($v1)\n", arg_count*4);
+        arg_count++;
+        ast_marker = ast_marker->next;
+      }
+      printf("    mv $v0, $v1\n");
+      return;
     case node_ARROW:
+      return;
     case node_ASSIGN:
+      // (assign n (* 2 3))
+      // recurse on the last child, that should result in a value
+      // in the return register
+      // look up n in our global hash to get the string reference
+      // move the result into the reference
+      emit_main(ast->last_child->val);
+      printf("    la $a0, %s\n", ast->children->val->val);
+      printf("    sw $v0, 0($a0)\n");
+      printf("\n");
+      return;
     case node_IF:
     case node_WHILE:
     case node_FOR:

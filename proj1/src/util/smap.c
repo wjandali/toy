@@ -169,7 +169,7 @@ void get_keys(smap *map) {
     buck = map->buckets + i;
     for (int j = 0; j < buck->num_pairs; j++) {
       pa = buck->pairs + j;
-      /* we're dealing with a struct if it starts with a dollar sign */
+      /* we're dealing with a struct if it starts with a $struct */
       if (strcmp(pa->key, "$struct") == 0) {
         printf("%s: .word", pa->key);
         c = 0;

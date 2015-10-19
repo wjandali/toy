@@ -20,6 +20,7 @@ int args_length[] = {2, 2, 2, 2, 2, 2, 2, 2, 2, -2, 2, 2, 3, 2, 4, -2, 1, 1, 0};
 /** A hashmap used for more efficient lookups of (keyword, enum) pairs. */
 smap *keyword_str_to_enum;
 smap *keyword_str_to_args_length;
+smap *func_decls;
 int struct_count = 1;
 
 /** Initializes keyword_str_to_enum so that it contains a map
@@ -97,6 +98,7 @@ void parse_init() {
   num_args = smap_new();
   strings = smap_new();
   keyword_str_to_enum = smap_new();
+  func_decls = smap_new();
 }
 
 void parse_close() {
@@ -217,7 +219,6 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
   AST_lst *child;
   AST_lst *last_child;
   AST_lst *args;
-  smap *func_decls = smap_new();
   char *struct_p;
   switch(ast->type) {
     /* no checks needed in the case of constants */
@@ -241,9 +242,12 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
       }
       return;
     case node_CALL:
-      if (smap_get(decls, ast->val) == -1) {
+      struct_p = (char *) safe_calloc((strlen(ast->val) + 7)*sizeof(char));
+      sprintf(struct_p, "$func_%s", ast->val);
+      if (smap_get(decls, struct_p) == -1) {
         fatal_error("function undefined");
       }
+      free(struct_p);
       child = ast->children;
       while (child != NULL) {
         gather_decls(child->val, env, 1);
@@ -279,7 +283,7 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
       /* recurse on the body */
       gather_decls(ast->last_child->val, env, 0);
       /* clear function-level assignments */
-      smap_del(func_decls);
+      smap_del_contents(func_decls);
       return;
     /* simple functions */
     default:
