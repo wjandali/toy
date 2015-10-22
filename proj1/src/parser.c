@@ -187,7 +187,7 @@ void free_ast (AST *ptr) {
   if (ptr->last_child) {
     free(ptr->last_child);
   }
-  if (ptr->children) {
+  if (ptr->children && ptr->children != ptr->last_child) {
     free(ptr->children);
   }
   free(ptr->val);
@@ -224,19 +224,22 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
     /* no checks needed in the case of constants */
     case node_INT:
     case node_STRING:
+      // a string outside an assignment
       return;
-    /* assignment */
+    case node_STRUCT:
+      if (is_top_level) {
+        struct_p = (char *) safe_calloc(((int) log10(struct_count) + 9)*sizeof(char));
+        sprintf(struct_p, "$struct%d", struct_count);
+        sprintf(ast->val, "$struct%d", struct_count);
+        struct_count++;
+        smap_put(decls, struct_p, AST_lst_len(ast->children)); 
+      }
+      return;
     case node_ASSIGN:
       last_child = ast->last_child;
       gather_decls(last_child->val, env, is_top_level);
       if (is_top_level) {
         smap_put(decls, ast->children->val->val, 1);
-        if (ast->children->next->val->type == node_STRUCT) {
-          struct_p = (char *) safe_calloc(((int) log10(struct_count) + 9)*sizeof(char));
-          sprintf(struct_p, "$struct%d", struct_count);
-          struct_count++;
-          smap_put(decls, struct_p, AST_lst_len(ast->children->next->val->children)); 
-        }
       } else {
         smap_put(func_decls, ast->children->val->val, 1);
       }
