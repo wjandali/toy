@@ -102,7 +102,6 @@ void parse_init() {
 }
 
 void parse_close() {
-  smap_del_contents(decls);
   smap_del(decls);
   smap_del(stack_sizes);
   smap_del(num_args);
@@ -238,10 +237,12 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
     case node_ASSIGN:
       last_child = ast->last_child;
       gather_decls(last_child->val, env, is_top_level);
+      struct_p = (char *) safe_calloc((strlen(ast->val) + 1)*sizeof(char));
+      sprintf(struct_p, "%s", ast->children->val->val);
       if (is_top_level) {
-        smap_put(decls, ast->children->val->val, 1);
+        smap_put(decls, struct_p, 1);
       } else {
-        smap_put(func_decls, ast->children->val->val, 1);
+        smap_put(func_decls, struct_p, 1);
       }
       return;
     case node_CALL:
@@ -253,7 +254,7 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
       free(struct_p);
       child = ast->children;
       while (child != NULL) {
-        gather_decls(child->val, env, 1);
+        gather_decls(child->val, env, is_top_level);
         child = child->next;
       }
       return;
@@ -280,13 +281,16 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
       sprintf(struct_p, "$func_%s", ast->children->val->val);
       smap_put(decls, struct_p, 1); // set func name
       while (args != NULL) { 
-        smap_put(func_decls, args->val->val, 1); // set function level assignment for each arg
+        struct_p = (char *) safe_calloc((strlen(args->val->val) + 1)*sizeof(char));
+        strcpy(struct_p, args->val->val);
+        smap_put(func_decls, struct_p, 1); // set function level assignment for each arg
         args = args->next;
       }
       /* recurse on the body */
       gather_decls(ast->last_child->val, env, 0);
       /* clear function-level assignments */
-      smap_del_contents(func_decls);
+      smap_del(func_decls);
+      func_decls = smap_new();
       return;
     /* simple functions */
     default:

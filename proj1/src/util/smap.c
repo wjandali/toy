@@ -161,6 +161,10 @@ void smap_del_contents(smap *map) {
   }
 }
 
+int key_count(smap *map) {
+  return map->num_pairs;
+}
+
 void get_keys(smap *map) {
   bucket *buck;
   pair *pa;
@@ -170,7 +174,7 @@ void get_keys(smap *map) {
     for (int j = 0; j < buck->num_pairs; j++) {
       pa = buck->pairs + j;
       /* we're dealing with a struct if it starts with a $struct */
-      if (strncmp(pa->key, "$struct", 6) == 0) {
+      if (strcmp(pa->key, "$struct") == 0) {
         printf("%s: .word", pa->key);
         c = 0;
         while (c < pa->val) {

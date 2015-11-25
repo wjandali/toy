@@ -1,2 +1,5 @@
-(assign x (* 100 (/ 50 18)))
-(intprint x)
+(function (square x) (* x x))
+(function (fourth a) (* (square (* 2 a)) (square (+ 1 a))))
+(function (double c) (* 2 (fourth (- 5 c))))
+(assign t (double 3))
+
