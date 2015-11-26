@@ -248,8 +248,9 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
     case node_CALL:
       struct_p = (char *) safe_calloc((strlen(ast->val) + 7)*sizeof(char));
       sprintf(struct_p, "$func_%s", ast->val);
+      strcpy(ast->val, struct_p);
       if (smap_get(decls, struct_p) == -1) {
-        fatal_error("function undefined");
+        fatal_error("uufunction undefined");
       }
       free(struct_p);
       child = ast->children;
@@ -279,6 +280,7 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
       /* set func at the top level */
       struct_p = (char *) safe_calloc((strlen(ast->children->val->val) + 7)*sizeof(char));
       sprintf(struct_p, "$func_%s", ast->children->val->val);
+      strcpy(ast->children->val->val, struct_p);
       smap_put(decls, struct_p, 1); // set func name
       while (args != NULL) { 
         struct_p = (char *) safe_calloc((strlen(args->val->val) + 1)*sizeof(char));
