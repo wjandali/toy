@@ -104,6 +104,20 @@ void read_token(lexer *lex) {
       curr_char = fgetc(lex->file);
     } while (curr_char >= '0' && curr_char <= '9' && i++);
     ungetc(curr_char, lex->file);
+  } else if (curr_char == '-') {
+      *(lex->buffer + i - 1) = curr_char;
+      curr_char = fgetc(lex->file);
+      if (curr_char >= '0' && curr_char <= '9' && i++) {
+        do {
+          *(lex->buffer + i - 1) = curr_char;
+          curr_char = fgetc(lex->file);
+        } while (curr_char >= '0' && curr_char <= '9' && i++);
+        ungetc(curr_char, lex->file);
+        lex->type = token_INT;
+      } else {
+        ungetc(curr_char, lex->file);
+        lex->type = token_KEYWORD;
+      }
   } else {
     int keyword = 0;
     do {

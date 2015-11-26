@@ -287,7 +287,7 @@ void emit_main(AST *ast) {
       printf("loop_body%d:\n", branch_counter);
       printf("\n");
       emit_main(ast->last_child->val);
-      printf("j while%d:\n", branch_counter);
+      printf("j while%d\n", branch_counter);
       printf("loop_end%d:\n", branch_counter);
       printf("\n");
       branch_counter++;
@@ -646,7 +646,7 @@ void emit_functions(AST *ast) {
       printf("loop_body%d:\n", branch_counter);
       printf("\n");
       emit_functions(ast->last_child->val);
-      printf("j while%d:\n", branch_counter);
+      printf("j while%d\n", branch_counter);
       printf("loop_end%d:\n", branch_counter);
       printf("\n");
       branch_counter++;

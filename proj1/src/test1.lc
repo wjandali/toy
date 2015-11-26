@@ -1,5 +1,4 @@
 (function (square x) (* x x))
-(function (fourth a) (* (square (* 2 a)) (square (+ 1 a))))
-(function (double c) (* 2 (fourth (- 5 c))))
-(assign t (double 3))
+(function (doublesquare a b) (* (square a) (square b)))
+(assign t (doublesquare 3 5))
 
