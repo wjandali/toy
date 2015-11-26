@@ -219,6 +219,7 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
   AST_lst *last_child;
   AST_lst *args;
   char *struct_p;
+  int arg_count;
   switch(ast->type) {
     /* no checks needed in the case of constants */
     case node_INT:
@@ -250,7 +251,9 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
       sprintf(struct_p, "$func_%s", ast->val);
       strcpy(ast->val, struct_p);
       if (smap_get(decls, struct_p) == -1) {
-        fatal_error("uufunction undefined");
+        fatal_error("function undefined");
+      } else if (smap_get(decls, struct_p) != AST_lst_len(ast->children)) {
+        fatal_error("wrong number of arguments");
       }
       free(struct_p);
       child = ast->children;
@@ -275,19 +278,21 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
       if (!is_top_level) {
         fatal_error("no higher order functions");
       }
+      arg_count = 0;
       /* (function (func arg1 arg2..) (* arg1 arg2)) */
       args = ast->children->val->children; //
       /* set func at the top level */
-      struct_p = (char *) safe_calloc((strlen(ast->children->val->val) + 7)*sizeof(char));
-      sprintf(struct_p, "$func_%s", ast->children->val->val);
-      strcpy(ast->children->val->val, struct_p);
-      smap_put(decls, struct_p, 1); // set func name
       while (args != NULL) { 
+        arg_count++;
         struct_p = (char *) safe_calloc((strlen(args->val->val) + 1)*sizeof(char));
         strcpy(struct_p, args->val->val);
         smap_put(func_decls, struct_p, 1); // set function level assignment for each arg
         args = args->next;
       }
+      struct_p = (char *) safe_calloc((strlen(ast->children->val->val) + 7)*sizeof(char));
+      sprintf(struct_p, "$func_%s", ast->children->val->val);
+      strcpy(ast->children->val->val, struct_p);
+      smap_put(decls, struct_p, arg_count); // set func name
       /* recurse on the body */
       gather_decls(ast->last_child->val, env, 0);
       /* clear function-level assignments */
