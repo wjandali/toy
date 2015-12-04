@@ -11,11 +11,13 @@ int text_seg_opened = 0;
 int main_seg_opened = 0;
 int branch_counter = 0;
 /** stack space increases that happen inside the body of a function **/
-int dynamic_stackspace = 0;
 int in_function = NULL;
 char *space = "     ";  
+char **vars;
+int func_arg_count = 0;
 
 void get_keys(smap *map);
+void increment_func_args();
 void store_v0();
 void get_from_stack(char *);
 void restore_stack();
@@ -355,10 +357,31 @@ void emit_main(AST *ast) {
   }
 }
 
+void increment_func_args(int val) {
+  // ** for each argument we increment its value by val
+  int t;
+  for (int i = 0; i++; i < func_arg_count) {
+    t = smap_get(func_arg_map, *(vars + i));
+    smap_put(func_arg_map, *(vars + i), t + val);
+  }
+}
+
+void add_to_func_args(char *string, int val) {
+  smap_put(func_arg_map, string, val);
+  char **t = (char **) safe_calloc((func_arg_count + 1)*sizeof(char *));
+  for (int i = 0; i++; i < func_arg_count) {
+    *(t + i) = *(vars + i);
+  }
+  *(t + func_arg_count) = string;
+  func_arg_count++;
+  free(vars);
+  vars = t;
+}
+
 void store_v0() {
+  increment_func_args(1);
   printf("    addi $sp, $sp, -4\n");
   printf("    sw   $v0, 0($sp)\n");
-  dynamic_stackspace++;
 }
 
 void get_from_stack(char *s) {
@@ -366,8 +389,8 @@ void get_from_stack(char *s) {
 }
 
 void restore_stack() {
+  increment_func_args(-1);
   printf("    addi $sp, $sp, 4\n");
-  dynamic_stackspace--;
 }
 
 void emit_exit() {
@@ -398,17 +421,8 @@ void emit_functions(AST *ast) {
       printf("\n");
       return;
     case node_VAR:
-      if (smap_get(func_arg_map, ast->val) != -1) {
-        // this is an argument
-        // move our pointer up the total number of existing vars scoped to the function that are not arguments
-        // add dynamic stack space and get the arg number
-        offset = (key_count(func_var_map) + smap_get(func_arg_map, ast->val) + dynamic_stackspace)*4;
-        printf("    lw $v0, %d($sp)\n", offset);
-      } else if (smap_get(func_var_map, ast->val) != -1) {
-        // this is a variable scoped to the function
-        printf("prob");
-        printf("    addi $a0, $sp, %d\n", 4*(key_count(func_var_map) - smap_get(func_var_map, ast->val) -1));
-      }
+      offset = smap_get(func_arg_map, ast->val)*4;
+      printf("    lw $v0, %d($sp)\n", offset);
       printf("\n");
       return;
     case node_CALL:
@@ -419,8 +433,10 @@ void emit_functions(AST *ast) {
         arg_count++;
         ast_marker = ast_marker->next;
       }
-      // the dynamic stack space needs to increase with the sp increase
-      dynamic_stackspace = dynamic_stackspace + arg_count + 1;
+      // {x, y, z}
+      // (func a b c)
+      // ** increment func_arg_map by arg_count + 1
+      increment_func_args(arg_count + 1);
       printf("    addi $sp, $sp, -%d\n", (arg_count + 1)*4);
       ast_marker = ast->children;
       arg_count = 0;
@@ -434,9 +450,10 @@ void emit_functions(AST *ast) {
       printf("    add $a0, $sp, $0\n");
       printf("    jal %s\n", ast->val);
       printf("    lw   $ra, %d($sp)\n", arg_count*4);
+      // ** increment func_arg_map by -(arg_count + 1)
+      increment_func_args(-arg_count - 1);
       printf("    addi $sp, $sp, %d\n", (arg_count + 1)*4);
       printf("\n");
-      dynamic_stackspace = dynamic_stackspace - arg_count - 1;
       return;
       // needs function def hash
     case node_AND:
@@ -540,29 +557,31 @@ void emit_functions(AST *ast) {
       printf("\n");
       return;
     case node_FUNCTION:
-      dynamic_stackspace = 0;
       in_function = 1;
       // (function (t a b c) (body))
       printf("%s:\n", ast->children->val->val);
       arg_count = 0;
       ast_marker = ast->children->val->children;
       // each var is stored in the hash beside its offset
+      // a b c
+      // sp
       while (ast_marker != NULL) {
         str = (char *) safe_calloc((strlen(ast_marker->val->val))*sizeof(char));
         strcpy(str, ast_marker->val->val);
-        smap_put(func_arg_map, str, arg_count);
+        increment_func_args(-1);
+        add_to_func_args(str, 0);
         arg_count++;
         ast_marker = ast_marker->next;
       }
+      increment_func_args(arg_count - 1);
       emit_functions(ast->last_child->val);
       // so a0 points to the args i.e. is $sp to begin
-      smap_del(func_var_map);
-      smap_del(func_arg_map);
-      func_arg_map = smap_new();
-      func_var_map = smap_new();
-      printf("    addi $sp, $sp, %d\n", dynamic_stackspace*4);
       printf("    jr $ra\n");
       in_function = 0;
+      func_arg_count = 0;
+      free(vars);
+      smap_del(func_arg_map);
+      func_arg_map = smap_new();
       return;
     case node_STRUCT:
       arg_count = 0;
@@ -571,6 +590,8 @@ void emit_functions(AST *ast) {
         arg_count++;
         ast_marker = ast_marker->next;
       }
+      // ** increment func_arg_map by arg_count
+      increment_func_args(arg_count);
       printf("    addi   $sp, $sp, -%d\n", arg_count*4);
       arg_count = 0;
       ast_marker = ast->children;
@@ -580,8 +601,9 @@ void emit_functions(AST *ast) {
         arg_count++;
         ast_marker = ast_marker->next;
       }
+      // ** increment func_arg_map by -arg_count
       printf("    addi   $v0, $sp, %d\n", arg_count*4);
-      dynamic_stackspace = dynamic_stackspace + arg_count;
+      increment_func_args(-arg_count);
       return;
     case node_ARROW:
       // (arrow (struct 3 2) 2) -> 2
@@ -601,21 +623,18 @@ void emit_functions(AST *ast) {
       // move the result into the reference
       emit_functions(ast->last_child->val);
       if (smap_get(func_arg_map, ast->children->val->val) != -1) {
-        // this is an argument
+        // this is defined variable
         // move our pointer up the total number of existing vars scoped to the function that are not arguments
-        printf("    addi $a0, $sp, %d\n", 4*key_count(func_var_map));
-        printf("    addi $a0, $a0, %d\n", 4*(key_count(func_arg_map)- smap_get(func_arg_map, ast->children->val->val) - 1));
-      } else if (smap_get(func_var_map, ast->children->val->val) != -1) {
-        // this is a variable scoped to the function
-        printf("    addi $a0, $sp, %d\n", 4*(key_count(func_var_map)- smap_get(func_var_map, ast->children->val->val) -1));
+        printf("    addi $a0, $sp, %d\n", smap_get(func_arg_map, ast->children->val->val)*4);
       } else {
         // this is a new variable
-        dynamic_stackspace++;
+        // ** increment stack space by 1
+        increment_func_args(1);
         printf("    addi $sp, $sp, -4\n");
         printf("    add   $a0, $sp, $0\n");
         str = (char *) safe_calloc((strlen(ast_marker->val->val))*sizeof(char));
         strcpy(str, ast_marker->val->val);
-        smap_put(func_var_map, str, key_count(func_var_map));
+        add_to_func_args(str, 0);
       }
       printf("    sw   $v0, 0($a0)\n");
       printf("\n");

@@ -1,0 +1,41 @@
+.data
+$space: .asciiz "\n"
+x: .word 0
+
+.text
+
+.global main
+
+main:
+    addi $v0, $0, 3
+    la   $a0, x
+    sw   $v0, 0($a0)
+
+    addi $sp, $sp, -8
+    addi $v0, $0, 3
+    sw   $v0, 0($sp)
+    addi $v0, $0, 2
+    sw   $v0, 4($sp)
+    addi $a0, $sp, 8
+    jal test
+    addi $sp, $sp, 8
+
+    la   $a0, x
+    sw   $v0, 0($a0)
+
+    li $v0 10
+    syscall
+test:
+    lw   $v0, 0($a0)
+
+    addi $sp, $sp, -4
+    sw   $v0, 0($sp)
+    lw   $v0, 0($a0)
+
+    lw   $t0, 0($sp)
+    addi $sp, $sp, 4
+    mult $t0, $v0
+    mflo $v0
+
+    addi $sp, $sp, 0
+    jr $ra
