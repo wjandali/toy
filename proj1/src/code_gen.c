@@ -19,7 +19,7 @@ int func_arg_count = 0;
 void get_keys(smap *map);
 void increment_func_args();
 void store_v0();
-void get_from_stack(char *);
+void get_from_stack(char *, int);
 void restore_stack();
 smap *func_var_map;
 smap *func_arg_map;
@@ -167,7 +167,7 @@ void emit_main(AST *ast) {
       emit_main(ast->children->val);
       store_v0();
       emit_main(ast->last_child->val);
-      get_from_stack("$t0");
+      get_from_stack("$t0", 0);
       restore_stack();
       printf("    add  $v0, $t0, $v0\n");
       printf("\n");
@@ -176,7 +176,7 @@ void emit_main(AST *ast) {
       emit_main(ast->children->val);
       store_v0();
       emit_main(ast->last_child->val);
-      get_from_stack("$t0");
+      get_from_stack("$t0", 0);
       restore_stack();
       printf("    sub  $v0, $t0, $v0\n");
       printf("\n");
@@ -185,7 +185,7 @@ void emit_main(AST *ast) {
       emit_main(ast->children->val);
       store_v0();
       emit_main(ast->last_child->val);
-      get_from_stack("$t0");
+      get_from_stack("$t0", 0);
       restore_stack();
       printf("    mult $t0, $v0\n");
       printf("    mflo $v0\n");
@@ -195,7 +195,7 @@ void emit_main(AST *ast) {
       emit_main(ast->children->val);
       store_v0();
       emit_main(ast->last_child->val);
-      get_from_stack("$t0");
+      get_from_stack("$t0", 0);
       restore_stack();
       printf("    slt  $v0, $t0, $v0\n");
       printf("\n");
@@ -204,7 +204,7 @@ void emit_main(AST *ast) {
       emit_main(ast->children->val);
       store_v0();
       emit_main(ast->last_child->val);
-      get_from_stack("$t0");
+      get_from_stack("$t0", 0);
       restore_stack();
       printf("    beq  $t0, $v0, $short_to_true%d\n", branch_counter);
       printf("\n");
@@ -221,7 +221,7 @@ void emit_main(AST *ast) {
       emit_main(ast->children->val);
       store_v0();
       emit_main(ast->last_child->val);
-      get_from_stack("$t0");
+      get_from_stack("$t0", 0);
       restore_stack();
       printf("    div  $t0, $v0\n");
       printf("    mflo $v0\n");
@@ -360,7 +360,7 @@ void emit_main(AST *ast) {
 void increment_func_args(int val) {
   // ** for each argument we increment its value by val
   int t;
-  for (int i = 0; i++; i < func_arg_count) {
+  for (int i = 0; i < func_arg_count; i++) {
     t = smap_get(func_arg_map, *(vars + i));
     smap_put(func_arg_map, *(vars + i), t + val);
   }
@@ -369,7 +369,7 @@ void increment_func_args(int val) {
 void add_to_func_args(char *string, int val) {
   smap_put(func_arg_map, string, val);
   char **t = (char **) safe_calloc((func_arg_count + 1)*sizeof(char *));
-  for (int i = 0; i++; i < func_arg_count) {
+  for (int i = 0; i < func_arg_count; i++) {
     *(t + i) = *(vars + i);
   }
   *(t + func_arg_count) = string;
@@ -379,13 +379,14 @@ void add_to_func_args(char *string, int val) {
 }
 
 void store_v0() {
+  /** CHECK THIS ONE OUT **/
   increment_func_args(1);
   printf("    addi $sp, $sp, -4\n");
   printf("    sw   $v0, 0($sp)\n");
 }
 
-void get_from_stack(char *s) {
-  printf("    lw   %s, 0($sp)\n", s);
+void get_from_stack(char *s, int i) {
+  printf("    lw   %s, %d($sp)\n", s, i*4);
 }
 
 void restore_stack() {
@@ -401,7 +402,7 @@ void emit_exit() {
 void emit_functions(AST *ast) {
     /* TODO: Implement me. */
   int arg_count;
-  int offset;
+  int sp0;
   char *str;
   AST_lst *ast_marker;
 
@@ -421,8 +422,7 @@ void emit_functions(AST *ast) {
       printf("\n");
       return;
     case node_VAR:
-      offset = smap_get(func_arg_map, ast->val)*4;
-      printf("    lw $v0, %d($sp)\n", offset);
+      printf("    lw $v0, %d($sp)\n", smap_get(func_arg_map, ast->val)*4);
       printf("\n");
       return;
     case node_CALL:
@@ -450,12 +450,8 @@ void emit_functions(AST *ast) {
       printf("    add $a0, $sp, $0\n");
       printf("    jal %s\n", ast->val);
       printf("    lw   $ra, %d($sp)\n", arg_count*4);
-      // ** increment func_arg_map by -(arg_count + 1)
-      increment_func_args(-arg_count - 1);
-      printf("    addi $sp, $sp, %d\n", (arg_count + 1)*4);
       printf("\n");
       return;
-      // needs function def hash
     case node_AND:
       // we check if the first argument is false
       // if so, jump down to return false
@@ -495,8 +491,9 @@ void emit_functions(AST *ast) {
     case node_PLUS:
       emit_functions(ast->children->val);
       store_v0();
+      sp0 = smap_get(func_arg_map, *(vars));
       emit_functions(ast->last_child->val);
-      get_from_stack("$t0");
+      get_from_stack("$t0", smap_get(func_arg_map, *(vars)) - sp0);
       restore_stack();
       printf("    add  $v0, $t0, $v0\n");
       printf("\n");
@@ -504,8 +501,9 @@ void emit_functions(AST *ast) {
     case node_MINUS:
       emit_functions(ast->children->val);
       store_v0();
+      sp0 = smap_get(func_arg_map, *(vars));
       emit_functions(ast->last_child->val);
-      get_from_stack("$t0");
+      get_from_stack("$t0", smap_get(func_arg_map, *(vars)) - sp0);
       restore_stack();
       printf("    sub  $v0, $t0, $v0\n");
       printf("\n");
@@ -513,8 +511,9 @@ void emit_functions(AST *ast) {
     case node_MUL:
       emit_functions(ast->children->val);
       store_v0();
+      sp0 = smap_get(func_arg_map, *(vars));
       emit_functions(ast->last_child->val);
-      get_from_stack("$t0");
+      get_from_stack("$t0", smap_get(func_arg_map, *(vars)) - sp0);
       restore_stack();
       printf("    mult $t0, $v0\n");
       printf("    mflo $v0\n");
@@ -523,8 +522,9 @@ void emit_functions(AST *ast) {
     case node_LT:
       emit_functions(ast->children->val);
       store_v0();
+      sp0 = smap_get(func_arg_map, *(vars));
       emit_functions(ast->last_child->val);
-      get_from_stack("$t0");
+      get_from_stack("$t0", smap_get(func_arg_map, *(vars)) - sp0);
       restore_stack();
       printf("    slt  $v0, $t0, $v0\n");
       printf("\n");
@@ -532,8 +532,9 @@ void emit_functions(AST *ast) {
     case node_EQ:
       emit_functions(ast->children->val);
       store_v0();
+      sp0 = smap_get(func_arg_map, *(vars));
       emit_functions(ast->last_child->val);
-      get_from_stack("$t0");
+      get_from_stack("$t0", smap_get(func_arg_map, *(vars)) - sp0);
       restore_stack();
       printf("    beq  $t0, $v0, $short_to_true%d\n", branch_counter);
       printf("\n");
@@ -549,8 +550,9 @@ void emit_functions(AST *ast) {
     case node_DIV:
       emit_functions(ast->children->val);
       store_v0();
+      sp0 = smap_get(func_arg_map, *(vars));
       emit_functions(ast->last_child->val);
-      get_from_stack("$t0");
+      get_from_stack("$t0", smap_get(func_arg_map, *(vars)) - sp0);
       restore_stack();
       printf("    div  $t0, $v0\n");
       printf("    mflo $v0\n");
@@ -576,14 +578,17 @@ void emit_functions(AST *ast) {
       increment_func_args(arg_count - 1);
       emit_functions(ast->last_child->val);
       // so a0 points to the args i.e. is $sp to begin
+      printf("    addi $sp, $sp, %d\n", smap_get(func_arg_map, *(vars))*4);
       printf("    jr $ra\n");
       in_function = 0;
       func_arg_count = 0;
       free(vars);
+      vars = 0;
       smap_del(func_arg_map);
       func_arg_map = smap_new();
       return;
     case node_STRUCT:
+      /* CHECK THIS ONE OUT */
       arg_count = 0;
       ast_marker = ast->children;
       while (ast_marker != NULL) {
@@ -595,25 +600,24 @@ void emit_functions(AST *ast) {
       printf("    addi   $sp, $sp, -%d\n", arg_count*4);
       arg_count = 0;
       ast_marker = ast->children;
+      sp0 = smap_get(func_arg_map, *(vars));
       while (ast_marker != NULL) {
         emit_functions(ast_marker->val);
-        printf("    sw   $v0, %d($sp)\n", arg_count*4);
+        printf("    sw   $v0, %d($sp)\n", (arg_count + smap_get(func_arg_map, *(vars)) - sp0)*4);
         arg_count++;
         ast_marker = ast_marker->next;
       }
-      // ** increment func_arg_map by -arg_count
-      printf("    addi   $v0, $sp, %d\n", arg_count*4);
-      increment_func_args(-arg_count);
+      printf("    addi   $v0, $sp, %d\n", (smap_get(func_arg_map, *(vars)) - sp0)*4);
       return;
     case node_ARROW:
       // (arrow (struct 3 2) 2) -> 2
-      emit_main(ast->children->val);
+      emit_functions(ast->children->val);
       printf("    addi $t0, $0, %s\n", ast->last_child->val->val);
       printf("    addi $t1, $0, 4\n");
       printf("    mult $t0, $t1\n");
       printf("    mflo $t0\n"); // $t0 is the offset
       printf("    add  $v0, $t0, $v0\n"); // $v0 now points to the value
-      printf("    $v0, 0($v0)\n");
+      printf("    lw $v0, 0($v0)\n");
       return;
     case node_ASSIGN:
       // (assign n (* 2 3))
@@ -632,8 +636,8 @@ void emit_functions(AST *ast) {
         increment_func_args(1);
         printf("    addi $sp, $sp, -4\n");
         printf("    add   $a0, $sp, $0\n");
-        str = (char *) safe_calloc((strlen(ast_marker->val->val))*sizeof(char));
-        strcpy(str, ast_marker->val->val);
+        str = (char *) safe_calloc((strlen(ast->children->val->val))*sizeof(char));
+        strcpy(str, ast->children->val->val);
         add_to_func_args(str, 0);
       }
       printf("    sw   $v0, 0($a0)\n");

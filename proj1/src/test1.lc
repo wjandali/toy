@@ -1,4 +1,4 @@
-(function (square x) (* x (assign t 6)))
+(function (square x) (* x (assign t (arrow (struct "hah" (assign u 8) 6 8) 2))))
 (function (doublesquare a b) (* (square a) (square (assign h 8))))
 (assign t (doublesquare 3 5))
 
