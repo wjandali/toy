@@ -1,0 +1,35 @@
+Usage: shutdown [OPTION]... TIME [MESSAGE]
+Bring the system down.
+
+Options:
+  -r                          reboot after shutdown
+  -h                          halt or power off after shutdown
+  -H                          halt after shutdown (implies -h)
+  -P                          power off after shutdown (implies -h)
+  -c                          cancel a running shutdown
+  -k                          only send warnings, don't shutdown
+  -q, --quiet                 reduce output to errors only
+  -v, --verbose               increase output to include informational messages
+      --help                  display this help and exit
+      --version               output version information and exit
+
+TIME may have different formats, the most common is simply the word 'now' which
+will bring the system down immediately.  Other valid formats are +m, where m is
+the number of minutes to wait until shutting down and hh:mm which specifies the
+time on the 24hr clock.
+
+Logged in users are warned by a message sent to their terminal, you may include
+an optional MESSAGE included with this.  Messages can be sent without actually
+bringing the system down by using the -k option.
+
+If TIME is given, the command will remain in the foreground until the shutdown
+occurs.  It can be cancelled by Control-C, or by another user using the -c
+option.
+
+The system is brought down into maintenance (single-user) mode by default, you
+can change this with either the -r or -h option which specify a reboot or
+system halt respectively.  The -h option can be further modified with -H or -P
+to specify whether to halt the system, or to power it off afterwards.  The
+default is left up to the shutdown scripts.
+
+Report bugs to <upstart-devel@lists.ubuntu.com>

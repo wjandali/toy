@@ -21,6 +21,7 @@ int args_length[] = {2, 2, 2, 2, 2, 2, 2, 2, 2, -2, 2, 2, 3, 2, 4, -2, 1, 1, 0};
 smap *keyword_str_to_enum;
 smap *keyword_str_to_args_length;
 smap *func_decls;
+int stack_count = 0;
 int struct_count = 1;
 
 /** Initializes keyword_str_to_enum so that it contains a map
@@ -102,6 +103,9 @@ void parse_init() {
 }
 
 void parse_close() {
+  smap_del_contents(decls);
+  smap_del_contents(num_args);
+  smap_del_contents(strings);
   smap_del(decls);
   smap_del(stack_sizes);
   smap_del(num_args);
@@ -113,7 +117,7 @@ AST *build_ast (lexer *lex) {
   /* build a tree of tokens */
   token_type curr_char = peek_type(lex);
   AST *tree = (AST *) safe_calloc(sizeof(AST));
-  tree->val = safe_calloc((lex->buff_len)*sizeof(char));
+  tree->val = safe_calloc((lex->buff_len + 8)*sizeof(char));
   AST *child;
   switch(curr_char) {
     /* begin by inspecting the current character */
@@ -130,6 +134,8 @@ AST *build_ast (lexer *lex) {
           fatal_error("undefined type in parenthesis");
         }
       }
+      free(tree->val);
+      tree->val = safe_calloc((lex->buff_len + 8)*sizeof(char));
       strcpy(tree->val, lex->buffer);
       read_token(lex);
 
@@ -243,6 +249,9 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
       if (is_top_level) {
         smap_put(decls, struct_p, 1);
       } else {
+        if (smap_get(func_decls, struct_p) == -1) {
+          stack_count++;
+        }
         smap_put(func_decls, struct_p, 1);
       }
       return;
@@ -254,6 +263,9 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
         fatal_error("function undefined");
       } else if (smap_get(decls, struct_p) != AST_lst_len(ast->children)) {
         fatal_error("wrong number of arguments");
+      }
+      if (!is_top_level) {
+        stack_count += AST_lst_len(ast->children) + 1;
       }
       free(struct_p);
       child = ast->children;
@@ -275,6 +287,7 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
       return;
     /* function definition */
     case node_FUNCTION:
+      stack_count = 0;
       if (!is_top_level) {
         fatal_error("no higher order functions");
       }
@@ -293,9 +306,11 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
       sprintf(struct_p, "$func_%s", ast->children->val->val);
       strcpy(ast->children->val->val, struct_p);
       smap_put(decls, struct_p, arg_count); // set func name
+      smap_put(stack_sizes, struct_p, stack_count);
       /* recurse on the body */
       gather_decls(ast->last_child->val, env, 0);
       /* clear function-level assignments */
+      smap_del_contents(func_decls);
       smap_del(func_decls);
       func_decls = smap_new();
       return;

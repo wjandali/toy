@@ -447,6 +447,7 @@ void emit_functions(AST *ast) {
       printf("    add $a0, $sp, $0\n");
       printf("    jal %s\n", ast->val);
       printf("    lw   $ra, %d($sp)\n", arg_count*4);
+      printf("    addi $sp, $sp, %d\n", (arg_count + 1)*4);
       printf("\n");
       return;
     case node_AND:
@@ -573,12 +574,10 @@ void emit_functions(AST *ast) {
         arg_count++;
         ast_marker = ast_marker->next;
       }
-      // allocate stack space for all vars 
-      printf("    addi $sp, $sp, -%d\n", smap_get(stack_sizes, ast->children->val->val)*4);
-      increment_func_args(arg_count - 1 + smap_get(stack_sizes, ast->children->val->val));
+      increment_func_args(arg_count - 1);
       emit_functions(ast->last_child->val);
       // so a0 points to the args i.e. is $sp to begin
-      printf("    addi $sp, $sp, %d\n", smap_get(func_arg_map, *(vars))*4);
+      printf("    addi $sp, $sp, %d\n", smap_get(stack_sizes, ast->children->val->val)*4);
       printf("    jr $ra\n");
       in_function = 0;
       func_arg_count = 0;

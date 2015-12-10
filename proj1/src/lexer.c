@@ -126,8 +126,8 @@ void read_token(lexer *lex) {
     } while (!white(curr_char) && curr_char != '(' && curr_char != ')' && i++);
     ungetc(curr_char, lex->file);
     *(lex->buffer + i) = '\0';
-    for (; keywords_left >= 0; keywords_left--) {
-      if (strcmp(lex->buffer, keywords[keywords_left]) == 0) {
+    for (; keywords_left > 0; keywords_left--) {
+      if (strcmp(lex->buffer, keywords[keywords_left - 1]) == 0) {
         lex->type = token_KEYWORD;
         keyword = 1;
         break;
