@@ -1,2 +1,2 @@
 (function (test a b) (if (and a b) a b))
-(assign t (test 1 0))
+(assign t (test 10 2))

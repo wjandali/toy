@@ -265,7 +265,7 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
         fatal_error("wrong number of arguments");
       }
       if (!is_top_level) {
-        stack_count += AST_lst_len(ast->children) + 1;
+        stack_count += AST_lst_len(ast->children);
       }
       free(struct_p);
       child = ast->children;

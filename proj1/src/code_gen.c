@@ -117,10 +117,9 @@ void emit_main(AST *ast) {
         ast_marker = ast_marker->next;
       }
       // store a pointer to the original stack in a0 and call the function
-      printf("    add $a0, $sp, $0\n");
       printf("    jal %s\n", ast->val);
       printf("    lw   $ra, %d($sp)\n", arg_count*4);
-      printf("    addi $sp, $sp, %d\n", (arg_count + 1)*4);
+      printf("    addi $sp, $sp, 4\n");
       printf("\n");
       return;
       // needs function def hash
@@ -444,16 +443,18 @@ void emit_functions(AST *ast) {
         ast_marker = ast_marker->next;
       }
       printf("    sw   $ra, %d($sp)\n", arg_count*4);
-      printf("    add $a0, $sp, $0\n");
       printf("    jal %s\n", ast->val);
       printf("    lw   $ra, %d($sp)\n", arg_count*4);
+      printf("    addi $sp, $sp, 4\n");
       printf("\n");
+      increment_func_args(-arg_count - 1);
       return;
     case node_AND:
       // we check if the first argument is false
       // if so, jump down to return false
       // the next line checks if the next argument is false
       // if so, jump down to return false
+      //
       // branch to return true
       emit_functions(ast->children->val);
       printf("    beq  $v0, $0, $short_to_false%d\n", branch_counter);
@@ -562,9 +563,10 @@ void emit_functions(AST *ast) {
       printf("%s:\n", ast->children->val->val);
       arg_count = 0;
       ast_marker = ast->children->val->children;
-      // each var is stored in the hash beside its offset
-      // a b c
-      // sp
+      // we allocate stack space for every variable in the function, sp now points N away
+      if (smap_get(stack_sizes, ast->children->val->val) > 0) {
+        printf("    addi $sp, $sp, -%d\n", smap_get(stack_sizes, ast->children->val->val)*4);
+      }
       while (ast_marker != NULL) {
         str = (char *) safe_calloc((strlen(ast_marker->val->val) + 1)*sizeof(char));
         strcpy(str, ast_marker->val->val);
@@ -573,12 +575,11 @@ void emit_functions(AST *ast) {
         arg_count++;
         ast_marker = ast_marker->next;
       }
-      // allocate stack space for all vars 
-      printf("    addi $sp, $sp, -%d\n", smap_get(stack_sizes, ast->children->val->val)*4);
-      increment_func_args(arg_count - 1 + smap_get(stack_sizes, ast->children->val->val));
+      // all our variables  are N away from where they should be
+      increment_func_args(smap_get(stack_sizes, ast->children->val->val) + arg_count - 1);
       emit_functions(ast->last_child->val);
       // so a0 points to the args i.e. is $sp to begin
-      printf("    addi $sp, $sp, %d\n", smap_get(func_arg_map, *(vars))*4);
+      printf("    addi $sp, $sp, %d\n", (smap_get(stack_sizes, ast->children->val->val) + arg_count)*4);
       printf("    jr $ra\n");
       in_function = 0;
       func_arg_count = 0;
@@ -631,10 +632,7 @@ void emit_functions(AST *ast) {
         printf("    addi $a0, $sp, %d\n", smap_get(func_arg_map, ast->children->val->val)*4);
       } else {
         // this is a new variable
-        // ** increment stack space by 1
-        increment_func_args(1);
-        printf("    addi $sp, $sp, -4\n");
-        printf("    add   $a0, $sp, $0\n");
+        printf("    add   $a0, $sp, %d\n", (smap_get(func_arg_map, *(vars + func_arg_count)) + 1)*4);
         str = (char *) safe_calloc((strlen(ast->children->val->val) + 1)*sizeof(char));
         strcpy(str, ast->children->val->val);
         add_to_func_args(str, 0);

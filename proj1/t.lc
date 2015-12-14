@@ -1,1 +1,5 @@
-(lt -4 1)
+(function (fib n) 
+	  (if n 
+	      (+ (fib (- n 1)) n)
+              n))
+(intprint (fib 5))
