@@ -1,5 +1,5 @@
 (function (fib n) 
-	  (if n 
-	      (+ (fib (- n 1)) n)
+	  (if (and n (assign h (- n 1))) 
+	      (+ (fib (- n 1)) (fib (assign x (arrow (struct 1 "af" (- n 2) 4) 2))))
               n))
-(intprint (fib 5))
+(intprint (fib 8))

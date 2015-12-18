@@ -2,4 +2,4 @@
 	  (if (and n (- n 1)) 
 	      (+ (fib (- n 1)) (fib (- n 2)))
               n))
-(intprint (fib 5))
+(intprint (fib 8))

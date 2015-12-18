@@ -240,6 +240,7 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
         struct_count++;
         smap_put(decls, struct_p, AST_lst_len(ast->children)); 
       }
+      stack_count = stack_count + AST_lst_len(ast->children) + 1;
       return;
     case node_ASSIGN:
       last_child = ast->last_child;
@@ -265,7 +266,7 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
         fatal_error("wrong number of arguments");
       }
       if (!is_top_level) {
-        stack_count += AST_lst_len(ast->children);
+        stack_count += AST_lst_len(ast->children) + 1;
       }
       free(struct_p);
       child = ast->children;
@@ -306,9 +307,9 @@ void gather_decls(AST *ast, char *env, int is_top_level) {
       sprintf(struct_p, "$func_%s", ast->children->val->val);
       strcpy(ast->children->val->val, struct_p);
       smap_put(decls, struct_p, arg_count); // set func name
-      smap_put(stack_sizes, struct_p, stack_count);
       /* recurse on the body */
       gather_decls(ast->last_child->val, env, 0);
+      smap_put(stack_sizes, struct_p, stack_count);
       /* clear function-level assignments */
       smap_del_contents(func_decls);
       smap_del(func_decls);
